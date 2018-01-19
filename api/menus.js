@@ -42,7 +42,7 @@ menusRouter.get('/:menuId', (req, res, next) => {
 });
 //post a menu
 menusRouter.post('/', (req, res, next) => {
-  const title = req.body.title;
+  const title = req.body.menu.title;
   if (!title) {
     return res.sendStatus(400);
   }
@@ -100,14 +100,13 @@ menusRouter.delete('/:menuId', (req, res, next) => {
       res.sendStatus(400);
     } else {
       const deleteSql = 'DELETE FROM Menu WHERE Menu.id = $menuId';
-      const deleteValues = {$menuId: req.params.menuId};
+      const deleteValue = {$menuId: req.params.menuId};
 
-      expressoDB.run(deleteSql, deleteValues, (error) => {
+      expressoDB.get(deleteSql, deleteValue, (error) => {
         if (error) {
           next(error);
-        } else {
-          res.status(204).send();
         }
+          res.status(204).send();
       });
     }
   });
