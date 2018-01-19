@@ -53,8 +53,8 @@ menuItemsRouter.post('/', (req, res, next) => {
         return res.sendStatus(400);
       }
 
-      const sql = 'INSERT INTO MenuItem (id, name, inventory, price, menu_id)' +
-          'VALUES ($id, $name, $inventory, $price, $menuId)';
+      const sql = 'INSERT INTO MenuItem (name, inventory, price, menu_id)' +
+          'VALUES ($name, $inventory, $price, $menuId)';
       const values = {
         $name: name,
         $inventory: inventory,
@@ -67,8 +67,8 @@ menuItemsRouter.post('/', (req, res, next) => {
           next(error);
         } else {
           expressoDB.get(`SELECT * FROM MenuItem WHERE MenuItem.id = ${this.lastID}`,
-            (error, menuitem) => {
-              res.status(201).json({menuitem: menuitem});
+            (error, menuItem) => {
+              res.status(201).json({menuItem: menuItem});
             });
         }
       });
@@ -81,7 +81,8 @@ menuItemsRouter.put('/:menuItemId', (req, res, next) => {
         inventory = req.body.menuItem.inventory,
         description = req.body.menuItem.description,
         price = req.body.menuItem.price,
-        menuId = req.params.menuId;
+        menuId = req.params.menuId,
+        menuItemId = req.params.menuItemId;
   const menuSql = 'SELECT * FROM Menu WHERE Menu.id = $menuId';
   const menuValues = {$menuId: menuId};
   expressoDB.get(menuSql, menuValues, (error, menu) => {
@@ -92,7 +93,7 @@ menuItemsRouter.put('/:menuItemId', (req, res, next) => {
         return res.sendStatus(400);
       }
 
-      const sql = 'UPDATE MenuItem SET name = $name, inventory = $inventory, menu_id = $menu_id' +
+      const sql = 'UPDATE MenuItem SET name = $name, inventory = $inventory, menu_id = $menuId' +
           'description = $description, price = $price ' +
           'WHERE MenuItem.id = $menuItemId';
       const values = {
@@ -100,17 +101,17 @@ menuItemsRouter.put('/:menuItemId', (req, res, next) => {
         $inventory: inventory,
         $description: description,
         $price: price,
-        $menu_id: req.params.menuId,
-        $menuItemId: req.params.menuItemId
+        $menuId: menuId,
+        $menuItemId: menuItemId
       };
 
       expressoDB.run(sql, values, function(error) {
         if (error) {
           next(error);
         } else {
-          db.get(`SELECT * FROM MenuItem WHERE MenuItem.id = ${req.params.menuItemId}`,
-            (error, menuitem) => {
-              res.status(200).json({menuitem: menuitem});
+          expressoDB.get(`SELECT * FROM MenuItem WHERE MenuItem.id = ${req.params.menuItemId}`,
+            (error, menuItem) => {
+              res.status(200).json({menuItem: menuItem});
             });
         }
       });
