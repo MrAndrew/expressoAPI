@@ -5,9 +5,9 @@ const sqlite3 = require('sqlite3');
 const expressoDB = new sqlite3.Database(process.env.TEST_DATABASE || './database.sqlite'); //maybe change the path
 
 //put param here
-menuItemsRouter.param('menuitemId', (req, res, next, menuitemId) => {
-  const sql = 'SELECT * FROM MenuItem WHERE MenuItem.id = $menuitemId';
-  const values = {$menuitemId: menuitemId};
+menuItemsRouter.param('menuItemId', (req, res, next, menuItemId) => {
+  const sql = 'SELECT * FROM MenuItem WHERE id = $menuItemId';
+  const values = {$menuItemId: menuItemId};
   expressoDB.get(sql, values, (error, menuitem) => {
     if (error) {
       next(error);
@@ -53,11 +53,12 @@ menuItemsRouter.post('/', (req, res, next) => {
         return res.sendStatus(400);
       }
 
-      const sql = 'INSERT INTO MenuItem (name, inventory, price, menu_id)' +
-          'VALUES ($name, $inventory, $price, $menuId)';
+      const sql = 'INSERT INTO MenuItem (name, inventory, description, price, menu_id)' +
+          'VALUES ($name, $inventory, $description, $price, $menuId)';
       const values = {
         $name: name,
         $inventory: inventory,
+        $description: description,
         $price: price,
         $menuId: req.params.menuId
       };
@@ -71,10 +72,10 @@ menuItemsRouter.post('/', (req, res, next) => {
               res.status(201).json({menuItem: menuItem});
             });
         }
-      });
+      }); //ends INSERT INTO MenuItem
     }
-  });
-});
+  });//ends Menu GET
+}); //ends POST route
 //update a current menu item
 menuItemsRouter.put('/:menuItemId', (req, res, next) => {
   const name = req.body.menuItem.name,
@@ -89,11 +90,11 @@ menuItemsRouter.put('/:menuItemId', (req, res, next) => {
     if (error) {
       next(error);
     } else {
-      if (!name || !inventory || !price || !menuId) {
+      if (!name || !inventory || !price) {
         return res.sendStatus(400);
       }
 
-      const sql = 'UPDATE MenuItem SET name = $name, inventory = $inventory, menu_id = $menuId' +
+      const sql = 'UPDATE MenuItem SET name = $name, inventory = $inventory, menu_id = $menuId, ' +
           'description = $description, price = $price ' +
           'WHERE MenuItem.id = $menuItemId';
       const values = {
@@ -120,40 +121,6 @@ menuItemsRouter.put('/:menuItemId', (req, res, next) => {
 });
 //delets an existing menu item
 menuItemsRouter.delete('/:menuItemId', (req, res, next) => {
-//check if menu or menu item exitst
- //  expressoDB.serialize(() => {
- //    const menuSql = 'SELECT * FROM Menu Where Menu.id = $menuId';
- //    const menuValues = {$menuId: req.params.menuId};
- //    expressoDB.get(menuSql, menuValues, (error, menu) => {
- //      if (error) {
- //        next(error);
- //      } else {
- //        if (!menu) {
- //        res.status(404).send();
- //      } else { next(); }
- //    }
- //   });
- //   const menuItemSql = 'SELECT * FROM Menu Where Menu.id = $menuId';
- //   const menuItemValues = {$menuItemId: req.params.menuItemId};
- //   expressoDB.get(menuItemSql, menuItemValues, (error, menuItem) => {
- //     if (error) {
- //       next(error);
- //     } else {
- //       if (!menuItem) {
- //       res.status(404).send();
- //     } else { next(); }
- //   }
- //  });
-  //  const deleteSql = 'DELETE FROM MenuItem WHERE MenuItem.id = $menuItemId';
-  //  const deleteValues = {$menuItemId: req.params.menuItemId};
-  //  expressoDB.run(deleteSql, deleteValues, (error) => {
-  //    if (error) {
-  //      next(error);
-  //    } else {
-  //      res.sendStatus(204);
-  //    }
-  //  });
- // });//end serialize
  const deleteSql = 'DELETE FROM MenuItem WHERE MenuItem.id = $menuItemId';
  const deleteValues = {$menuItemId: req.params.menuItemId};
  expressoDB.run(deleteSql, deleteValues, (error) => {
