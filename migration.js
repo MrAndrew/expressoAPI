@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3');
 const expressoDB = new sqlite3.Database('./database.sqlite');
 
+
 expressoDB.serialize(function() {
   expressoDB.run('CREATE TABLE IF NOT EXISTS `Employee` ( ' +
            '`id` INTEGER NOT NULL, ' +
