@@ -6,7 +6,7 @@ const expressoDB = new sqlite3.Database(process.env.TEST_DATABASE || './database
 
 const menuItemsRouter = require('./menu-items.js');
 
-//Put a param here
+//param checks for valid menu with menuId supplied in url request
 menusRouter.param('menuId', (req, res, next, menuId) => {
   const sql = 'SELECT * FROM Menu WHERE id = $menuId';
   const values = {$menuId: menuId};
@@ -24,7 +24,6 @@ menusRouter.param('menuId', (req, res, next, menuId) => {
 
 menusRouter.use('/:menuId/menu-items', menuItemsRouter);
 
-//request routes here
 //get all current menus
 menusRouter.get('/', (req, res, next) => {
   expressoDB.all('SELECT * FROM Menu',
@@ -40,7 +39,7 @@ menusRouter.get('/', (req, res, next) => {
 menusRouter.get('/:menuId', (req, res, next) => {
   res.status(200).json({menu: req.menu});
 });
-//post a menu
+//post a new menu
 menusRouter.post('/', (req, res, next) => {
   const title = req.body.menu.title;
   if (!title) {
@@ -52,7 +51,7 @@ menusRouter.post('/', (req, res, next) => {
   const values = {
     $title: title,
   };
-
+//creates and sends back the new Menu from sql table to the client as a json object
   expressoDB.run(sql, values, function(error) {
     if (error) {
       next(error);
@@ -77,7 +76,7 @@ menusRouter.put('/:menuId', (req, res, next) => {
     $title: title,
     $menuId: req.params.menuId
   };
-
+//updates and sends back the menu from sql table to the client as a json object
   expressoDB.run(sql, values, (error) => {
     if (error) {
       next(error);

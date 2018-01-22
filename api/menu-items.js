@@ -4,7 +4,7 @@ const menuItemsRouter = express.Router({mergeParams: true});
 const sqlite3 = require('sqlite3');
 const expressoDB = new sqlite3.Database(process.env.TEST_DATABASE || './database.sqlite'); //maybe change the path
 
-//put param here
+//parm checks for valid MenuItems from the menuItemId in the url request
 menuItemsRouter.param('menuItemId', (req, res, next, menuItemId) => {
   const sql = 'SELECT * FROM MenuItem WHERE id = $menuItemId';
   const values = {$menuItemId: menuItemId};
@@ -19,8 +19,7 @@ menuItemsRouter.param('menuItemId', (req, res, next, menuItemId) => {
   });
 });
 
-//route requests here
-//Get menuitems
+//Get menuitems and returns as a json object
 menuItemsRouter.get('/', (req, res, next) => {
   const sql = 'SELECT * FROM MenuItem WHERE menu_id = $menuId';
   const values = { $menuId: req.params.menuId};
@@ -62,7 +61,7 @@ menuItemsRouter.post('/', (req, res, next) => {
         $price: price,
         $menuId: req.params.menuId
       };
-
+//creates and sends back the menu item from sql table to the client as a json object
       expressoDB.run(sql, values, function(error) {
         if (error) {
           next(error);
@@ -72,9 +71,9 @@ menuItemsRouter.post('/', (req, res, next) => {
               res.status(201).json({menuItem: menuItem});
             });
         }
-      }); //ends INSERT INTO MenuItem
+      });
     }
-  });//ends Menu GET
+  });
 }); //ends POST route
 //update a current menu item
 menuItemsRouter.put('/:menuItemId', (req, res, next) => {
@@ -105,7 +104,7 @@ menuItemsRouter.put('/:menuItemId', (req, res, next) => {
         $menuId: menuId,
         $menuItemId: menuItemId
       };
-
+//updates and sends back the menu item from sql table to the client as a json object
       expressoDB.run(sql, values, function(error) {
         if (error) {
           next(error);
@@ -130,7 +129,6 @@ menuItemsRouter.delete('/:menuItemId', (req, res, next) => {
      res.sendStatus(204);
    }
  });
-
 });//end delete route
 
 module.exports = menuItemsRouter;

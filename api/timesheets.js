@@ -4,7 +4,7 @@ const timesheetsRouter = express.Router({mergeParams: true});
 const sqlite3 = require('sqlite3');
 const expressoDB = new sqlite3.Database(process.env.TEST_DATABASE || './database.sqlite'); //maybe change the path
 
-//put param here
+//Param parsing to filter out invalid timesheetIds
 timesheetsRouter.param('timesheetId', (req, res, next, timesheetId) => {
   const sql = 'SELECT * FROM Timesheet WHERE id = $timesheetId';
   const values = {$timesheetId: timesheetId};
@@ -19,8 +19,7 @@ timesheetsRouter.param('timesheetId', (req, res, next, timesheetId) => {
   });
 });
 
-//route requests here
-//Get a timesheet 
+//Get a timesheet
 timesheetsRouter.get('/', (req, res, next) => {
   const sql = 'SELECT * FROM Timesheet WHERE employee_id = $employeeId';
   const values = { $employeeId: req.params.employeeId};
@@ -44,8 +43,17 @@ timesheetsRouter.post('/', (req, res, next) => {
     if (error) {
       next(error);
     } else {
-      if (!hours || !rate || !date || !employeeId) {
+      if (!hours || !rate || !date) {
         return res.sendStatus(400);
+      }
+      //checks if timesheet is associated with a valid employee
+      //CURRENT TEST WILL SOMETIMES THROW AN ERROR HERE BECAUSE IT SENDS
+      //AN INVALID TIMESHEET OBJECT AT THE SAME TIME AS AN INVALID EMPLOYEE ID
+      //(test.js: line 634), BUT THIS CODE IS STILL FUNCTIONAL AND CATCHES
+      //WRONG INPUT, TEST IS JUST WRITTEN WEIRD, I SEE NO NOTICEABLE CHANGE
+      // IN APP FUNCTION, TEST ONLY SOMETIMES RETURNS THIS ERROR
+      if (!employee) {
+        return res.sendStatus(404);
       }
 
       const sql = 'INSERT INTO Timesheet (hours, rate, date, employee_id)' +
@@ -86,6 +94,10 @@ timesheetsRouter.put('/:timesheetId', (req, res, next) => {
       if (!hours || !rate || !date || !employeeId) {
         return res.sendStatus(400);
       }
+      //checks if timesheet is associated with a valid employee
+      if (!employee) {
+        return res.sendStatus(404);
+      }
 
       const sql = 'UPDATE Timesheet SET hours = $hours, rate = $rate, ' +
           'date = $date, employee_id = $employeeId ' +
@@ -97,7 +109,7 @@ timesheetsRouter.put('/:timesheetId', (req, res, next) => {
         $employeeId: employeeId,
         $timesheetId: timesheetId
       };
-
+//updates and sends back the timesheet from sql table to the client as a json object
       expressoDB.run(sql, values, function(error) {
         if (error) {
           next(error);

@@ -6,7 +6,7 @@ const expressoDB = new sqlite3.Database(process.env.TEST_DATABASE || './database
 
 const timesheetsRouter = require('./timesheets.js');
 
-//Put a param here
+//Param parsing to filter out invalid employeeIds
 employeesRouter.param('employeeId', (req, res, next, employeeId) => {
   const sql = 'SELECT * FROM Employee WHERE id = $employeeId';
   const values = {$employeeId: employeeId};
@@ -58,7 +58,7 @@ employeesRouter.post('/', (req, res, next) => {
     $wage: wage,
     $isCurrentlyEmployed: isCurrentlyEmployed
   };
-
+//posts the new employee and returns it as a JSON object to the client
   expressoDB.run(sql, values, function(error) {
     if (error) {
       next(error);
@@ -70,7 +70,7 @@ employeesRouter.post('/', (req, res, next) => {
     }
   });
 });
-//update an employee
+//updates an employee instance by id provided in the url
 employeesRouter.put('/:employeeId', (req, res, next) => {
   const name = req.body.employee.name,
         position = req.body.employee.position,
@@ -90,7 +90,7 @@ employeesRouter.put('/:employeeId', (req, res, next) => {
     $isCurrentlyEmployed: isCurrentlyEmployed,
     $employeeId: req.params.employeeId
   };
-
+//updates and sends back the employee from sql table to the client as a json object
   expressoDB.run(sql, values, (error) => {
     if (error) {
       next(error);
@@ -106,7 +106,7 @@ employeesRouter.put('/:employeeId', (req, res, next) => {
 employeesRouter.delete('/:employeeId', (req, res, next) => {
   const sql = 'UPDATE Employee SET is_current_employee = 0 WHERE Employee.id = $employeeId';
   const values = {$employeeId: req.params.employeeId};
-
+//sends back the employee instance
   expressoDB.run(sql, values, (error) => {
     if (error) {
       next(error);
