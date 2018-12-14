@@ -2,9 +2,9 @@
 
 ## Overview
 
-In this capstone project, I built all of the routing and database logic for a fictional business (restaurant or small cafe).
+In this project, I built all of the routing and database logic for a fictional business (restaurant or small cafe).
 
-The Expresso internal tool should allow users to:
+The Expresso internal tool allows users to:
 - Create, view, update, and delete _menus_
 - Create, view, update, and delete _menu items_
 - Create, view, update, and delete _employees_
