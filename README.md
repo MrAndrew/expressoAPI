@@ -14,9 +14,10 @@ Starting code can be found [here](https://s3.amazonaws.com/codecademy-content/pr
 
 ## How To Begin
 
-To start, download the code from the repository. You need Node.js to run this. `npm install` to make sure you have everything you need to start the project. `npm run` to begin the server code. 
+To start, download the code from the repository. You need Node.js to run this. Run the command `npm install` from the root of this project to make sure you have everything you need to start the project. Run `node server.js` to begin the server code.
 
-To view thee site locally, open **index.html** in Google Chrome.
+To view the site locally, open **index.html** in your web browser of choice. Try
+using Chrome if it doesn't appear to work correctly.
 
 ## Implementation Details
 
